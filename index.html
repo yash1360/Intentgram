@@ -30,21 +30,40 @@
         </section>
     </main>
 
+    <dialog id="addCategoryDialog" class="modal">
+        <form id="addCategoryForm" method="dialog">
+            <h3>Add Category</h3>
+            <div class="field">
+                <label for="categoryName">Category Name</label>
+                <input id="categoryName" name="categoryName" type="text" placeholder="e.g. Friends" required />
+            </div>
+            <div class="field">
+                <label for="categoryKeyword">Keyword</label>
+                <input id="categoryKeyword" name="categoryKeyword" type="text" placeholder="e.g. friends, family, work" required />
+                <small class="hint">A keyword to help organize this category.</small>
+            </div>
+
+            <div class="error" id="categoryFormError" aria-live="assertive" hidden></div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn ghost" id="cancelCategory">Cancel</button>
+                <button type="submit" class="btn primary">Create</button>
+            </div>
+        </form>
+    </dialog>
+
     <dialog id="addProfileDialog" class="modal">
         <form id="addProfileForm" method="dialog">
             <h3>Add Profile</h3>
             <div class="field">
-                <label for="personName">Name</label>
-                <input id="personName" name="personName" type="text" placeholder="e.g. Jane Doe" required />
-            </div>
-            <div class="field">
                 <label for="instagramUrl">Instagram URL</label>
                 <input id="instagramUrl" name="instagramUrl" type="url" placeholder="https://instagram.com/username" required />
-                <small class="hint">Use a full profile URL so we can extract the username.</small>
+                <small class="hint">We'll automatically fetch the name and profile picture.</small>
             </div>
             <div class="field">
-                <label for="profileImage">Profile image (optional)</label>
+                <label for="profileImage">Custom profile image (optional)</label>
                 <input id="profileImage" name="profileImage" type="file" accept="image/*" />
+                <small class="hint">Leave empty to use Instagram profile picture.</small>
             </div>
 
             <div class="error" id="formError" aria-live="assertive" hidden></div>
