@@ -24,13 +24,13 @@ body{
 
 .app-header{
   position:sticky;top:0;z-index:10;
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:center;justify-content:center;
   padding:16px 20px;margin:0 0 8px;
   background:rgba(11,14,20,.6);backdrop-filter:saturate(1.2) blur(12px);
   border-bottom:1px solid rgba(255,255,255,.05);
 }
-.app-brand{font-weight:700;letter-spacing:.2px}
-.app-tabs{display:flex;gap:6px}
+.app-brand{font-weight:700;letter-spacing:.2px;font-size:20px}
+.app-tabs{display:none}
 .tab{
   appearance:none;border:0;cursor:pointer;
   color:var(--muted);background:transparent;
@@ -45,8 +45,8 @@ body{
 .cards-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
 
 .card{
-  display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:14px;
-  padding:14px;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:20px;border-radius:14px;
   background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
   border:1px solid rgba(255,255,255,.06);
   box-shadow:var(--shadow);
@@ -55,14 +55,15 @@ body{
 @keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 .avatar{
-  width:56px;height:56px;border-radius:14px;flex:0 0 56px;
+  width:80px;height:80px;border-radius:50%;
   background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(34,197,94,.35));
-  background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.12)
+  background-size:cover;background-position:center;border:2px solid rgba(255,255,255,.12)
 }
-.meta .name{margin:0;font-size:16px;font-weight:600}
-.meta .username{margin:4px 0 0;color:var(--muted);font-size:13px}
+.meta{text-align:center}
+.meta .name{margin:0;font-size:18px;font-weight:600}
+.meta .username{margin:4px 0 0;color:var(--muted);font-size:14px}
 
-.actions{display:flex;gap:8px;align-items:center}
+.actions{display:flex;gap:8px;align-items:center;justify-content:center}
 .btn{
   appearance:none;border:0;cursor:pointer;border-radius:10px;
   padding:10px 12px;font-weight:600;color:#0b0e14;background:#e6edf3;
@@ -77,7 +78,7 @@ body{
 /* Floating add button that shifts right as list grows */
 .add-card{
   display:flex;align-items:center;justify-content:center;gap:10px;
-  padding:14px;border:1px dashed rgba(255,255,255,.18);border-radius:14px;
+  padding:14px;border:0;border-radius:14px;
   color:var(--muted);background:rgba(255,255,255,.04);
   grid-column:1 / -1; /* full width at start, then will align via JS */
 }
@@ -103,17 +104,16 @@ input[type="text"],input[type="url"],input[type="file"]{
 
 /* Category cards */
 .category-card{
-  display:grid;grid-template-columns:60px 1fr auto;align-items:center;gap:16px;
-  padding:18px;border-radius:16px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:20px;border-radius:16px;
   background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
   border:1px solid rgba(255,255,255,.08);
   box-shadow:var(--shadow);
   transform:translateY(0);opacity:0;animation:cardIn .35s ease forwards;
 }
-.category-icon{font-size:28px;text-align:center}
+.category-info{text-align:center}
 .category-info h3{margin:0;font-size:18px;font-weight:600}
 .category-info p{margin:4px 0 0;color:var(--muted);font-size:14px}
-.category-info .keyword{color:var(--accent);font-weight:500}
 
 /* Category header */
 .category-header{
@@ -124,7 +124,10 @@ input[type="text"],input[type="url"],input[type="file"]{
 .category-header p{margin:6px 0 0;color:var(--muted)}
 
 /* Back button */
-.back-btn{margin-bottom:16px;grid-column:1 / -1}
+.back-btn{
+  position:absolute;top:20px;left:20px;z-index:5;
+  margin-bottom:16px;grid-column:1 / -1;
+}
 
 /* Empty state */
 .empty-state{
@@ -136,13 +139,8 @@ input[type="text"],input[type="url"],input[type="file"]{
 .empty-state p{margin:0;font-size:14px}
 
 @media (max-width:640px){
-  .card{grid-template-columns:48px 1fr;grid-template-areas:"avatar meta" "actions actions"}
-  .avatar{width:48px;height:48px}
-  .actions{grid-column:1 / -1}
-  .category-card{grid-template-columns:50px 1fr;grid-template-areas:"icon info" "button button"}
-  .category-icon{grid-area:icon}
-  .category-info{grid-area:info}
-  .category-card .btn{grid-area:button;justify-self:stretch}
+  .avatar{width:60px;height:60px}
+  .back-btn{position:static;margin-bottom:16px}
 }
 
 
