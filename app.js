@@ -129,11 +129,8 @@ function renderCategories() {
     const card = document.createElement('div');
     card.className = 'category-card';
     card.innerHTML = `
-      <div class="category-icon">📁</div>
       <div class="category-info">
         <h3>${category.name}</h3>
-        <p>${category.profiles.length} profile${category.profiles.length !== 1 ? 's' : ''}</p>
-        <p class="keyword">Keyword: ${category.keyword}</p>
       </div>
       <button class="btn primary" onclick="openCategory('${category.id}')">Open</button>
     `;
@@ -150,7 +147,7 @@ function renderProfiles(category) {
   // Add back button
   const backBtn = document.createElement('button');
   backBtn.className = 'btn ghost back-btn';
-  backBtn.innerHTML = '← Back to Categories';
+  backBtn.innerHTML = 'Back';
   backBtn.onclick = () => {
     window.location.href = 'index.html';
   };
@@ -161,7 +158,6 @@ function renderProfiles(category) {
   header.className = 'category-header';
   header.innerHTML = `
     <h2>${category.name}</h2>
-    <p>${category.profiles.length} profile${category.profiles.length !== 1 ? 's' : ''}</p>
   `;
   cardsRow.appendChild(header);
   
@@ -239,6 +235,9 @@ function createAddCategoryCard() {
 function openCategory(categoryId) {
   window.location.href = `index.html?category=${categoryId}`;
 }
+
+// Make openCategory globally accessible
+window.openCategory = openCategory;
 
 addForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -351,12 +350,10 @@ addCategoryForm.addEventListener('submit', (e) => {
 
 cancelCategoryBtn.addEventListener('click', () => addCategoryDialog.close());
 
-// Init
+
 const currentCategory = getCurrentCategory();
 if (currentCategory) {
   renderProfiles(currentCategory);
 } else {
   renderCategories();
 }
-
-
