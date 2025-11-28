@@ -1,6 +1,6 @@
 const STORAGE_KEY = 'profiles.v2';
 
-/** @typedef {{ id: string; name: string; username: string; imageDataUrl?: string }} Profile */
+/** @typedef {{ id: string; name: string; username: string }} Profile */
 /** @typedef {{ id: string; name: string; keyword: string; profiles: Profile[] }} Category */
 
 const cardsRow = document.getElementById('cardsRow');
@@ -24,7 +24,7 @@ function readCategories() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
+    if (!Array.isArray(parsed)) return [];``
     return parsed;
   } catch {
     return [];
@@ -44,9 +44,18 @@ function getCurrentCategory() {
   return categories.find(c => c.id === categoryId) || null;
 }
 
-function normalizeInstagramUrl(url) {
+function normalizeInstagramUrl(input) {
+  const value = input.trim();
+  if (!value) return null;
+
+  if (!/^https?:\/\//i.test(value)) {
+    const username = value.replace(/^@/, '').split(/[/?#]/)[0];
+    if (!username) return null;
+    return { username, url: `https://instagram.com/${username}` };
+  }
+
   try {
-    const u = new URL(url);
+    const u = new URL(value);
     if (!/instagram\.com$/i.test(u.hostname.replace(/^www\./, ''))) return null;
     const parts = u.pathname.split('/').filter(Boolean);
     if (parts.length === 0) return null;
@@ -134,6 +143,17 @@ function renderCategories() {
       </div>
       <button class="btn primary" onclick="openCategory('${category.id}')">Open</button>
     `;
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'card-close';
+    closeBtn.setAttribute('aria-label', `Remove ${category.name}`);
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      deleteCategory(category.id);
+    });
+    card.appendChild(closeBtn);
     cardsRow.appendChild(card);
   });
   
@@ -175,16 +195,12 @@ function renderProfiles(category) {
     const tpl = /** @type {HTMLTemplateElement} */ (document.getElementById('cardTemplate'));
     const node = tpl.content.firstElementChild.cloneNode(true);
     node.dataset.id = p.id;
-    const avatar = node.querySelector('.avatar');
     const name = node.querySelector('.name');
     const username = node.querySelector('.username');
     const openBtn = node.querySelector('.btn.open');
 
     name.textContent = p.name;
     username.textContent = `@${p.username}`;
-    if (p.imageDataUrl) {
-      avatar.style.backgroundImage = `url(${p.imageDataUrl})`;
-    }
 
     openBtn.addEventListener('click', () => {
       const { appUrl, webUrl } = instaDeepLink(p.username);
@@ -199,22 +215,24 @@ function renderProfiles(category) {
       }, 1200);
     });
 
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'card-close';
+    closeBtn.setAttribute('aria-label', `Remove ${p.name || p.username}`);
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      deleteProfile(category.id, p.id);
+    });
+    node.appendChild(closeBtn);
+
     cardsRow.appendChild(node);
   });
 
   // Add profile button
   const addCard = createAddCard();
   cardsRow.appendChild(addCard);
-}
-
-async function fileToDataUrl(file) {
-  if (!file) return undefined;
-  const reader = new FileReader();
-  return new Promise((resolve, reject) => {
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
 }
 
 function createAddCategoryCard() {
@@ -239,6 +257,36 @@ function openCategory(categoryId) {
 // Make openCategory globally accessible
 window.openCategory = openCategory;
 
+function deleteCategory(categoryId) {
+  const categories = readCategories();
+  const index = categories.findIndex(c => c.id === categoryId);
+  if (index === -1) return;
+  categories.splice(index, 1);
+  writeCategories(categories);
+  const viewingCategoryId = new URLSearchParams(window.location.search).get('category');
+  if (viewingCategoryId === categoryId) {
+    window.location.href = 'index.html';
+    return;
+  }
+  renderCategories();
+}
+
+function deleteProfile(categoryId, profileId) {
+  const categories = readCategories();
+  const categoryIndex = categories.findIndex(c => c.id === categoryId);
+  if (categoryIndex === -1) return;
+  const profileIndex = categories[categoryIndex].profiles.findIndex(p => p.id === profileId);
+  if (profileIndex === -1) return;
+  categories[categoryIndex].profiles.splice(profileIndex, 1);
+  writeCategories(categories);
+  const viewingCategoryId = new URLSearchParams(window.location.search).get('category');
+  if (viewingCategoryId === categoryId) {
+    renderProfiles(categories[categoryIndex]);
+  } else {
+    renderCategories();
+  }
+}
+
 addForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const formError = document.getElementById('formError');
@@ -246,7 +294,6 @@ addForm.addEventListener('submit', async (e) => {
   formError.textContent = '';
 
   const url = /** @type {HTMLInputElement} */ (document.getElementById('instagramUrl')).value.trim();
-  const file = /** @type {HTMLInputElement} */ (document.getElementById('profileImage')).files?.[0];
 
   const norm = normalizeInstagramUrl(url);
   if (!norm) {
@@ -265,7 +312,6 @@ addForm.addEventListener('submit', async (e) => {
     // Fetch Instagram profile data
     const profileData = await fetchInstagramProfile(norm.username);
     
-    const imageDataUrl = await fileToDataUrl(file);
     const categories = readCategories();
     const currentCategory = getCurrentCategory();
     
@@ -279,8 +325,7 @@ addForm.addEventListener('submit', async (e) => {
     const profile = { 
       id, 
       name: profileData.name, 
-      username: profileData.username, 
-      imageDataUrl: imageDataUrl || (profileData.imageUrl ? await fetchImageAsDataUrl(profileData.imageUrl) : null)
+      username: profileData.username
     };
     
     // Update the category
@@ -302,26 +347,14 @@ addForm.addEventListener('submit', async (e) => {
   }
 });
 
-async function fetchImageAsDataUrl(imageUrl) {
-  try {
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
-}
-
 cancelAddBtn.addEventListener('click', () => addDialog.close());
 
 // Category management
 const addCategoryDialog = document.getElementById('addCategoryDialog');
 const addCategoryForm = document.getElementById('addCategoryForm');
 const cancelCategoryBtn = document.getElementById('cancelCategory');
+const closeCategoryBtn = document.getElementById('closeCategoryDialog');
+const categoryDialogTitle = addCategoryDialog?.querySelector('h3');
 
 addCategoryForm.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -330,10 +363,11 @@ addCategoryForm.addEventListener('submit', (e) => {
   formError.textContent = '';
 
   const name = document.getElementById('categoryName').value.trim();
-  const keyword = document.getElementById('categoryKeyword').value.trim();
+  const keywordInput = document.getElementById('categoryKeyword');
+  const keyword = keywordInput ? keywordInput.value.trim() : '';
 
-  if (!name || !keyword) {
-    formError.textContent = 'Please fill in all fields.';
+  if (!name) {
+    formError.textContent = 'Please provide a category name.';
     formError.hidden = false;
     return;
   }
@@ -349,6 +383,78 @@ addCategoryForm.addEventListener('submit', (e) => {
 });
 
 cancelCategoryBtn.addEventListener('click', () => addCategoryDialog.close());
+closeCategoryBtn?.addEventListener('click', () => addCategoryDialog.close());
+
+if (addCategoryDialog && categoryDialogTitle) {
+  const originalCategoryShowModal = addCategoryDialog.showModal.bind(addCategoryDialog);
+
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+  const centerCategoryDialog = () => {
+    const rect = addCategoryDialog.getBoundingClientRect();
+    const left = clamp((window.innerWidth - rect.width) / 2, 0, Math.max(0, window.innerWidth - rect.width));
+    const top = clamp((window.innerHeight - rect.height) / 2, 0, Math.max(0, window.innerHeight - rect.height));
+    addCategoryDialog.style.left = `${left}px`;
+    addCategoryDialog.style.top = `${top}px`;
+    addCategoryDialog.style.transform = 'none';
+  };
+
+  addCategoryDialog.showModal = function showModalWithPosition() {
+    originalCategoryShowModal();
+    requestAnimationFrame(centerCategoryDialog);
+  };
+
+  let dragState = null;
+
+  const stopDragging = (event) => {
+    if (!dragState) return;
+    if (event && categoryDialogTitle.hasPointerCapture(event.pointerId)) {
+      categoryDialogTitle.releasePointerCapture(event.pointerId);
+    }
+    dragState = null;
+    addCategoryDialog.classList.remove('dragging');
+    window.removeEventListener('pointermove', handlePointerMove);
+    window.removeEventListener('pointerup', stopDragging);
+    window.removeEventListener('pointercancel', stopDragging);
+  };
+
+  const handlePointerMove = (event) => {
+    if (!dragState) return;
+    event.preventDefault();
+    const left = clamp(event.clientX - dragState.offsetX, 0, Math.max(0, window.innerWidth - addCategoryDialog.offsetWidth));
+    const top = clamp(event.clientY - dragState.offsetY, 0, Math.max(0, window.innerHeight - addCategoryDialog.offsetHeight));
+    addCategoryDialog.style.left = `${left}px`;
+    addCategoryDialog.style.top = `${top}px`;
+    addCategoryDialog.style.transform = 'none';
+  };
+
+  categoryDialogTitle.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0 || !addCategoryDialog.open) return;
+    dragState = {
+      offsetX: event.clientX - addCategoryDialog.offsetLeft,
+      offsetY: event.clientY - addCategoryDialog.offsetTop
+    };
+    categoryDialogTitle.setPointerCapture(event.pointerId);
+    addCategoryDialog.classList.add('dragging');
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', stopDragging);
+    window.addEventListener('pointercancel', stopDragging);
+  });
+
+  categoryDialogTitle.addEventListener('pointerup', stopDragging);
+  categoryDialogTitle.addEventListener('pointerleave', stopDragging);
+
+  addCategoryDialog.addEventListener('close', () => {
+    dragState = null;
+    addCategoryDialog.classList.remove('dragging');
+  });
+
+  window.addEventListener('resize', () => {
+    if (addCategoryDialog.open && !dragState) {
+      centerCategoryDialog();
+    }
+  });
+}
 
 
 const currentCategory = getCurrentCategory();
@@ -357,3 +463,5 @@ if (currentCategory) {
 } else {
   renderCategories();
 }
+
+
