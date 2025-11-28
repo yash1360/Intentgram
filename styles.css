@@ -127,7 +127,16 @@ body{
 }
 .add-btn:hover{transform:translateY(-2px)}
 
-.modal{border:0;border-radius:24px;padding:0;background:var(--panel);color:var(--text);box-shadow:var(--shadow)}
+.modal{
+  border:0;
+  border-radius:24px;
+  padding:0;
+  background:var(--panel);
+  color:var(--text);
+  box-shadow:var(--shadow);
+  margin:auto;
+  width:min(90vw,420px);
+}
 .modal::backdrop{background:rgba(91,74,84,.35)}
 .modal form{padding:18px;min-width:320px}
 .field{display:flex;flex-direction:column;gap:8px;margin:12px 0}
@@ -229,113 +238,5 @@ input[type="text"],input[type="url"],input[type="file"]{
     align-items:flex-start;
   }
   .category-info{text-align:left}
-}
-
-/* Retro Windows XP styling for Add Category dialog */
-#addCategoryDialog{
-  font-family:'Press Start 2P','Courier New',monospace;
-  font-size:12px;
-  border-radius:8px;
-  border:2px solid #0f2c8c;
-  background:#dfe9ff;
-  padding:0;
-  box-shadow:6px 6px 0 rgba(0,0,0,.35), inset 0 0 0 2px #f4f8ff;
-  color:#1b1b1b;
-  text-transform:none;
-  -webkit-font-smoothing:none;
-  font-smooth:never;
-}
-#addCategoryDialog::backdrop{
-  background:rgba(0,0,0,.6);
-}
-#addCategoryDialog form{
-  padding:0;
-  min-width:320px;
-  border:2px solid #ffffff;
-  background:#fdfdfd;
-  position:relative;
-}
-#addCategoryDialog .modal-close{
-  position:absolute;
-  top:10px;
-  right:10px;
-  width:26px;
-  height:35px;
-  border:2px solid #830808;
-  border-radius:2px;
-  background:#d94444;
-  color:#fff;
-  font-family:'Press Start 2P','Courier New',monospace;
-  font-size:14px;
-  line-height:1;
-  padding:0;
-  cursor:pointer;
-  box-shadow:inset -2px -2px 0 rgba(0,0,0,.2);
-}
-#addCategoryDialog .modal-close:hover{
-  background:#ff5f5f;
-}
-#addCategoryDialog .modal-close:active{
-  box-shadow:inset 2px 2px 0 rgba(0,0,0,.25);
-}
-#addCategoryDialog h3{
-  display:none;
-}
-#addCategoryDialog form::before{
-  content:'Add Category';
-  display:block;
-  background:#1f4ba0;
-  color:#fff;
-  padding:14px 18px;
-  border-bottom:2px solid #0f2c8c;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-}
-#addCategoryDialog .field{
-  margin:14px 18px;
-}
-#addCategoryDialog label{
-  font-family:inherit;
-  font-size:11px;
-  color:#0f2c8c;
-  letter-spacing:.05em;
-}
-#addCategoryDialog input[type="text"]{
-  font-family:inherit;
-  font-size:12px;
-  color:#1b1b1b;
-  border-radius:2px;
-  border:2px solid #8aa6ff;
-  background:#fff;
-  box-shadow:inset 2px 2px 0 #dbe5ff;
-  padding:10px;
-}
-#addCategoryDialog .error{
-  font-family:inherit;
-  font-size:11px;
-  color:#b00020;
-  margin:0 18px;
-}
-#addCategoryDialog .modal-actions{
-  padding:0 18px 18px;
-  justify-content:flex-end;
-}
-#addCategoryDialog .btn{
-  font-family:inherit;
-  font-size:11px;
-  text-transform:uppercase;
-  border-radius:2px;
-  border:2px solid #0f2c8c;
-  background:#dfe8ff;
-  color:#1b1b1b;
-  box-shadow:inset -2px -2px 0 #aabaef;
-  padding:10px 16px;
-  transition:none;
-}
-#addCategoryDialog .btn:hover{
-  background:#f9fbff;
-}
-#addCategoryDialog .btn:active{
-  box-shadow:inset 2px 2px 0 #8da2dd;
 }
 
