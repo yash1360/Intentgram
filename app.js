@@ -1,7 +1,7 @@
 const STORAGE_KEY = 'profiles.v2';
 
 /** @typedef {{ id: string; name: string; username: string }} Profile */
-/** @typedef {{ id: string; name: string; keyword: string; profiles: Profile[] }} Category */
+/** @typedef {{ id: string; name: string; profiles: Profile[] }} Category */
 
 const cardsRow = document.getElementById('cardsRow');
 const addDialog = document.getElementById('addProfileDialog');
@@ -363,8 +363,6 @@ addCategoryForm.addEventListener('submit', (e) => {
   formError.textContent = '';
 
   const name = document.getElementById('categoryName').value.trim();
-  const keywordInput = document.getElementById('categoryKeyword');
-  const keyword = keywordInput ? keywordInput.value.trim() : '';
 
   if (!name) {
     formError.textContent = 'Please provide a category name.';
@@ -374,7 +372,7 @@ addCategoryForm.addEventListener('submit', (e) => {
 
   const categories = readCategories();
   const id = crypto.randomUUID();
-  const category = { id, name, keyword, profiles: [] };
+  const category = { id, name, profiles: [] };
   categories.push(category);
   writeCategories(categories);
   renderCategories();
