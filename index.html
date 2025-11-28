@@ -34,13 +34,13 @@
         <form id="addCategoryForm" method="dialog">
             <h3>Add Category</h3>
             <div class="field">
-                <label for="categoryName">Category Name</label>
-                <input id="categoryName" name="categoryName" type="text" placeholder="e.g. Friends" required />
+                <label for="categoryName"></label>
+                <input id="categoryName" name="categoryName" type="text" placeholder="Name" required />
             </div>
             <div class="field">
-                <label for="categoryKeyword">Keyword</label>
-                <input id="categoryKeyword" name="categoryKeyword" type="text" placeholder="e.g. friends, family, work" required />
-                <small class="hint">A keyword to help organize this category.</small>
+                <label for="categoryKeyword"></label>
+                <input id="categoryKeyword" name="categoryKeyword" type="text" placeholder="Keywords (optional)" />
+                
             </div>
 
             <div class="error" id="categoryFormError" aria-live="assertive" hidden></div>
@@ -56,14 +56,9 @@
         <form id="addProfileForm" method="dialog">
             <h3>Add Profile</h3>
             <div class="field">
-                <label for="instagramUrl">Instagram URL</label>
-                <input id="instagramUrl" name="instagramUrl" type="url" placeholder="https://instagram.com/username" required />
-                <small class="hint">We'll automatically fetch the name and profile picture.</small>
-            </div>
-            <div class="field">
-                <label for="profileImage">Custom profile image (optional)</label>
-                <input id="profileImage" name="profileImage" type="file" accept="image/*" />
-                <small class="hint">Leave empty to use Instagram profile picture.</small>
+                <label for="instagramUrl"></label>
+                <input id="instagramUrl" name="instagramUrl" type="text" placeholder="@username or https://instagram.com/username" required />
+                <small class="hint">Paste a profile link or just type the username.</small>
             </div>
 
             <div class="error" id="formError" aria-live="assertive" hidden></div>
@@ -77,7 +72,6 @@
 
     <template id="cardTemplate">
         <article class="card" data-id="">
-            <div class="avatar" aria-hidden="true"></div>
             <div class="meta">
                 <h4 class="name"></h4>
                 <p class="username"></p>
